@@ -1,0 +1,13 @@
+# Node & Environment
+node_modules/
+.env
+
+# Flutter / Dart
+/frontend_mobile/build/
+/frontend_mobile/.dart_tool/
+/frontend_mobile/.pub-cache/
+/frontend_mobile/.pub/
+
+# OS generated files
+.DS_Store
+Thumbs.db
