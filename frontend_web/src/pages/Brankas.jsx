@@ -53,6 +53,88 @@ export default function Brankas() {
     return { color: "#F59E0B", bg: "rgba(245,158,11,0.1)", border: "rgba(245,158,11,0.3)" };
   };
 
+  // === UI untuk user yang belum login ===
+  if (!isAuthenticated) {
+    return (
+      <PublicLayout>
+        <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "40px 24px 80px" }}>
+          {/* Header */}
+          <div style={{ marginBottom: "32px" }}>
+            <h1 style={{ fontSize: "28px", fontWeight: 700, marginBottom: "6px" }}>
+              🔐 Brankas Digital
+            </h1>
+            <p style={{ color: "var(--text-grey)", fontSize: "14px" }}>
+              Semua aset dan riwayat pesanan kamu ada di sini
+            </p>
+          </div>
+
+          {/* Not Logged In Banner */}
+          <div style={{
+            textAlign: "center", padding: "80px 40px",
+            background: "linear-gradient(135deg, rgba(0,240,255,0.05), rgba(139,92,246,0.08))",
+            borderRadius: "var(--radius-lg)",
+            border: "1px solid rgba(0,240,255,0.2)",
+          }}>
+            <div style={{ fontSize: "72px", marginBottom: "20px" }}>🔒</div>
+            <h2 style={{ color: "var(--text-white)", marginBottom: "12px", fontSize: "22px" }}>
+              Login untuk membuka Brankas kamu
+            </h2>
+            <p style={{ color: "var(--text-grey)", marginBottom: "32px", fontSize: "14px", maxWidth: "420px", margin: "0 auto 32px" }}>
+              Brankas menyimpan semua aset digital dan riwayat custom order kamu. Masuk dulu untuk bisa melihatnya!
+            </p>
+            <div style={{ display: "flex", gap: "12px", justifyContent: "center", flexWrap: "wrap" }}>
+              <button
+                onClick={() => navigate("/login", { state: { returnTo: "/brankas" } })}
+                style={{
+                  padding: "13px 36px", borderRadius: "10px",
+                  background: "linear-gradient(135deg, #00F0FF, #0891B2)",
+                  color: "#0F172A", border: "none", fontWeight: 700,
+                  cursor: "pointer", fontSize: "15px", transition: "opacity 0.2s",
+                }}
+                onMouseEnter={e => e.currentTarget.style.opacity = "0.85"}
+                onMouseLeave={e => e.currentTarget.style.opacity = "1"}
+              >
+                🔑 Masuk Sekarang
+              </button>
+              <button
+                onClick={() => navigate("/register")}
+                style={{
+                  padding: "13px 36px", borderRadius: "10px",
+                  background: "transparent",
+                  color: "var(--text-grey)", border: "1px solid var(--border-subtle)",
+                  fontWeight: 600, cursor: "pointer", fontSize: "15px", transition: "all 0.2s",
+                }}
+                onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--accent-cyan)"; e.currentTarget.style.color = "var(--accent-cyan)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--border-subtle)"; e.currentTarget.style.color = "var(--text-grey)"; }}
+              >
+                Daftar Akun
+              </button>
+            </div>
+
+            {/* Feature Hints */}
+            <div style={{ display: "flex", gap: "24px", justifyContent: "center", marginTop: "48px", flexWrap: "wrap" }}>
+              {[
+                { icon: "📦", label: "Aset Digital Saya" },
+                { icon: "📋", label: "Riwayat Custom Order" },
+                { icon: "⬇", label: "Download File Langsung" },
+              ].map((feat, i) => (
+                <div key={i} style={{
+                  display: "flex", flexDirection: "column", alignItems: "center", gap: "8px",
+                  padding: "16px 24px", borderRadius: "10px",
+                  background: "var(--bg-surface)", border: "1px solid var(--border-subtle)",
+                  minWidth: "120px",
+                }}>
+                  <span style={{ fontSize: "28px" }}>{feat.icon}</span>
+                  <span style={{ fontSize: "12px", color: "var(--text-grey)", fontWeight: 600, textAlign: "center" }}>{feat.label}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </PublicLayout>
+    );
+  }
+
   return (
     <PublicLayout>
       <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "40px 24px 80px" }}>

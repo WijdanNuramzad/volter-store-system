@@ -41,6 +41,8 @@ export default function PublicLayout({ children }) {
 
   const navLinks = [
     { path: "/", label: "Beranda" },
+    { path: "/portfolio", label: "Portofolio" },
+    { path: "/pricing", label: "Harga" },
     { path: "/brankas", label: "Brankas" },
     { path: "/my-orders", label: "Pesanan Custom" },
   ];

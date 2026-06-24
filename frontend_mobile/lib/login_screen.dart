@@ -124,6 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Container(
                 padding: EdgeInsets.all(16),
                 decoration: BoxDecoration(
+                  
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(

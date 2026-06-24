@@ -158,9 +158,10 @@ class _CreateRequestScreenState extends State<CreateRequestScreen> {
               final int userId = prefs.getInt('user_id') ?? 0;
 
               try {
+                final headers = await AppConstants.getAuthHeaders();
                 final response = await http.post(
                   Uri.parse('${AppConstants.kBaseUrl}/api/custom-orders'),
-                  headers: {'Content-Type': 'application/json'},
+                  headers: headers,
                   body: jsonEncode({
                     'buyer_id': userId,
                     'judul_project': _judulController.text,

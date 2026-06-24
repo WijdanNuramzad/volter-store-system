@@ -392,7 +392,7 @@ export default function AdminDashboard() {
         <div className="fade-in">
           {/* Stats Grid */}
           <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: "16px", marginBottom: "28px" }}>
-            <StatCard icon="💰" label="Total Pendapatan" value={`Rp ${(stats.pendapatan || 0).toLocaleString("id-ID")}`} color="#22C55E" trend={12} sub="Dari semua transaksi" />
+            <StatCard icon="💰" label="Total Pendapatan" value={`Rp ${Number(stats.pendapatan || 0).toLocaleString("id-ID")}`} color="#22C55E" trend={12} sub="Dari semua transaksi" />
             <StatCard icon="🛠" label="Order Aktif" value={stats.order_aktif || 0} color="#00F0FF" trend={5} sub="Sedang dikerjakan" />
             <StatCard icon="📦" label="Total Aset" value={assets.length} color="#8B5CF6" sub="Di etalase publik" />
             <StatCard icon="🛒" label="Aset Terjual" value={stats.aset_terjual || 0} color="#F59E0B" trend={8} sub="Total pembelian" />

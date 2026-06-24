@@ -54,11 +54,10 @@ class _CartScreenState extends State<CartScreen> {
         final data = jsonDecode(response.body);
 
         setState(() {
-          // 👇 Kita modifikasi datanya: Tambahkan status Centang & Kuantitas awal
+          // 👇 Kita modifikasi datanya: Tambahkan status Centang
           _cartItems = (data['data'] as List).map((item) {
             return Map<String, dynamic>.from(item)..addAll({
               'isSelected': false,
-              'qty': 1, // Default kuantitas 1
             });
           }).toList();
 
@@ -79,8 +78,7 @@ class _CartScreenState extends State<CartScreen> {
     for (var item in _cartItems) {
       if (item['isSelected'] == true) {
         int harga = double.tryParse(item['harga'].toString())?.toInt() ?? 0;
-        int qty = item['qty'] as int;
-        total += (harga * qty);
+        total += harga;
       } else {
         allSelected =
             false; // Jika ada 1 yang tidak dicentang, matikan "Pilih Semua"
@@ -109,17 +107,6 @@ class _CartScreenState extends State<CartScreen> {
         item['isSelected'] = _isPilihSemua;
       }
       _hitungTotal();
-    });
-  }
-
-  // Aksi Tombol Plus Minus
-  void _ubahKuantitas(int index, int delta) {
-    setState(() {
-      int currentQty = _cartItems[index]['qty'];
-      if (currentQty + delta > 0) {
-        _cartItems[index]['qty'] = currentQty + delta;
-        _hitungTotal(); // Hitung ulang totalnya
-      }
     });
   }
 
@@ -444,31 +431,6 @@ class _CartScreenState extends State<CartScreen> {
                     fontWeight: FontWeight.bold,
                   ),
                 ),
-                SizedBox(height: 12),
-
-                // 👇 TOMBOL PLUS MINUS QTY
-                Row(
-                  children: [
-                    _buildQtyBtn(
-                      icon: Icons.remove,
-                      onTap: () => _ubahKuantitas(index, -1),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 12),
-                      child: Text(
-                        '${item['qty']}',
-                        style: TextStyle(
-                          color: textWhite,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    _buildQtyBtn(
-                      icon: Icons.add,
-                      onTap: () => _ubahKuantitas(index, 1),
-                    ),
-                  ],
-                ),
               ],
             ),
           ),
@@ -479,21 +441,6 @@ class _CartScreenState extends State<CartScreen> {
             icon: Icon(Icons.delete_outline, color: Colors.redAccent),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildQtyBtn({required IconData icon, required VoidCallback onTap}) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(4),
-      child: Container(
-        padding: EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          border: Border.all(color: textGrey.withOpacity(0.5)),
-          borderRadius: BorderRadius.circular(4),
-        ),
-        child: Icon(icon, size: 16, color: textWhite),
       ),
     );
   }

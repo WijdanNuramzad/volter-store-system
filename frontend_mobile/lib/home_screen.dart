@@ -11,6 +11,8 @@ import 'admin_panel_screen.dart';
 import 'cart_screen.dart';
 import 'custom_order_screen.dart';
 import 'profile_screen.dart';
+import 'portfolio_screen.dart';
+import 'pricing_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   @override
@@ -269,6 +271,70 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontWeight: FontWeight.bold,
                       fontFamily: 'Poppins',
                     ),
+                  ),
+                  SizedBox(height: 20),
+
+                  // === SHORTCUT: PORTOFOLIO & HARGA ===
+                  Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PortfolioScreen())),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [accentPurple.withOpacity(0.15), bgSurface],
+                                begin: Alignment.topLeft, end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: accentPurple.withOpacity(0.35)),
+                            ),
+                            child: Row(children: [
+                              Container(
+                                width: 36, height: 36,
+                                decoration: BoxDecoration(color: accentPurple.withOpacity(0.15), borderRadius: BorderRadius.circular(8)),
+                                child: Center(child: Text('🖼️', style: TextStyle(fontSize: 18))),
+                              ),
+                              SizedBox(width: 10),
+                              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                Text('Portofolio', style: TextStyle(color: textWhite, fontWeight: FontWeight.bold, fontSize: 13)),
+                                Text('Lihat karya kami', style: TextStyle(color: textGrey, fontSize: 10)),
+                              ]),
+                            ]),
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 12),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => PricingScreen())),
+                          child: Container(
+                            padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [accentCyan.withOpacity(0.1), bgSurface],
+                                begin: Alignment.topLeft, end: Alignment.bottomRight,
+                              ),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(color: accentCyan.withOpacity(0.35)),
+                            ),
+                            child: Row(children: [
+                              Container(
+                                width: 36, height: 36,
+                                decoration: BoxDecoration(color: accentCyan.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                                child: Center(child: Text('💰', style: TextStyle(fontSize: 18))),
+                              ),
+                              SizedBox(width: 10),
+                              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                                Text('Harga', style: TextStyle(color: textWhite, fontWeight: FontWeight.bold, fontSize: 13)),
+                                Text('Cek paket kami', style: TextStyle(color: textGrey, fontSize: 10)),
+                              ]),
+                            ]),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                   SizedBox(height: 20),
 

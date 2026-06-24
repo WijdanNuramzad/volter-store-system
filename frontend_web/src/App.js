@@ -13,6 +13,8 @@ import MyOrders from "./pages/MyOrders";
 import OrderHistory from "./pages/OrderHistory";
 import Profile from "./pages/Profile";
 import Wishlist from "./pages/Wishlist";
+import Portfolio from "./pages/Portfolio";
+import Pricing from "./pages/Pricing";
 import { AuthProvider, AuthContext } from "./context/AuthContext";
 import PrivateRoute from "./components/PrivateRoute"; // Import satpam kita
 
@@ -53,6 +55,8 @@ const AppRoutes = () => {
         } />
         
         <Route path="/product/:id" element={<ProductDetail />} />
+        <Route path="/portfolio" element={<Portfolio />} />
+        <Route path="/pricing" element={<Pricing />} />
         
         <Route path="/cart" element={
           <PrivateRoute>
@@ -60,11 +64,7 @@ const AppRoutes = () => {
           </PrivateRoute>
         } />
         
-        <Route path="/brankas" element={
-          <PrivateRoute>
-            <Brankas />
-          </PrivateRoute>
-        } />
+        <Route path="/brankas" element={<Brankas />} />
         
         <Route path="/my-orders" element={
           <PrivateRoute>

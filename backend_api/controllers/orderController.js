@@ -21,8 +21,8 @@ const beliAset = async (req, res) => {
     const statusPesanan = harga === 0 ? "lunas" : "pending";
 
     const [result] = await dbPool.query(
-      "INSERT INTO orders (buyer_id, asset_id, status) VALUES (?, ?, ?)",
-      [buyer_id, asset_id, statusPesanan],
+      "INSERT INTO orders (buyer_id, asset_id, status, qty, total_harga) VALUES (?, ?, ?, ?, ?)",
+      [buyer_id, asset_id, statusPesanan, 1, harga],
     );
 
     res.status(201).json({
