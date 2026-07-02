@@ -159,7 +159,7 @@ export default function CustomOrder() {
 
   useEffect(() => {
     if (isAuthenticated && user?.id) {
-      api.get(`/custom-orders/${user.id}`)
+      api.get(`/custom-orders/my-orders`)
         .then(res => setMyOrders(res.data?.data || res.data || []))
         .catch(() => {})
         .finally(() => setOrdersLoading(false));
@@ -507,12 +507,14 @@ export default function CustomOrder() {
                           </strong>
                         </span>
                         {(order.status || "").toLowerCase().includes("pembayaran") && (
-                          <button style={{
-                            padding: "8px 20px", borderRadius: "8px",
-                            background: "var(--accent-cyan)", color: "#0F172A",
-                            border: "none", fontWeight: 700, cursor: "pointer", fontSize: "13px",
-                          }}>
-                            💳 Bayar Sekarang
+                          <button 
+                            onClick={() => navigate("/my-orders")}
+                            style={{
+                              padding: "8px 20px", borderRadius: "8px",
+                              background: "var(--accent-cyan)", color: "#0F172A",
+                              border: "none", fontWeight: 700, cursor: "pointer", fontSize: "13px",
+                            }}>
+                            🧾 Lihat Tagihan & Bayar
                           </button>
                         )}
                         {(order.status || "").toLowerCase() === "selesai" && (order.rating === 0 || !order.rating) && (

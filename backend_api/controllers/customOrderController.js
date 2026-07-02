@@ -141,13 +141,27 @@ const submitReview = async (req, res) => {
 const bayarOrderJasa = async (req, res) => {
   try {
     const { order_id } = req.params;
-    await dbPool.query(
-      "UPDATE custom_requests SET status = 'IN PROGRESS' WHERE id = ?",
-      [order_id],
-    );
+    let bukti_pembayaran = null;
+    
+    if (req.file) {
+      bukti_pembayaran = req.file.filename;
+    }
+
+    if (bukti_pembayaran) {
+      await dbPool.query(
+        "UPDATE custom_requests SET status = 'Menunggu Verifikasi', bukti_pembayaran = ? WHERE id = ?",
+        [bukti_pembayaran, order_id],
+      );
+    } else {
+      await dbPool.query(
+        "UPDATE custom_requests SET status = 'Menunggu Verifikasi' WHERE id = ?",
+        [order_id],
+      );
+    }
+
     res
       .status(200)
-      .json({ message: "Pembayaran berhasil! Project mulai dikerjakan." });
+      .json({ message: "Bukti terkirim! Menunggu verifikasi tim Volter." });
   } catch (error) {
     res.status(500).json({ message: "Gagal memproses pembayaran" });
   }

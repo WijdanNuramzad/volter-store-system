@@ -44,6 +44,7 @@ function StatusBadge({ status }) {
   const s = (status || "").toLowerCase();
   let color = "#F59E0B", bg = "rgba(245,158,11,0.1)", border = "rgba(245,158,11,0.3)";
   if (s.includes("selesai")) { color = "#22C55E"; bg = "rgba(34,197,94,0.1)"; border = "rgba(34,197,94,0.3)"; }
+  else if (s.includes("verifikasi")) { color = "#3B82F6"; bg = "rgba(59,130,246,0.1)"; border = "rgba(59,130,246,0.3)"; }
   else if (s.includes("progress") || s.includes("proses")) { color = "#00F0FF"; bg = "rgba(0,240,255,0.1)"; border = "rgba(0,240,255,0.3)"; }
   else if (s.includes("pembayaran") || s.includes("quotation")) { color = "#8B5CF6"; bg = "rgba(139,92,246,0.1)"; border = "rgba(139,92,246,0.3)"; }
 
@@ -102,7 +103,7 @@ function OrderRow({ order, onSave, onChat }) {
       <td style={{ padding: "14px 16px" }}>
         <select value={status} onChange={e => setStatus(e.target.value)}
           style={{ ...inputStyle, cursor: "pointer", width: "100%", marginBottom: (progress == 100 || status === "Selesai") ? "8px" : "0" }}>
-          {["Menunggu Konfirmasi", "Quotation", "Menunggu Pembayaran", "In Progress", "Revisi", "Selesai"].map(s =>
+          {["Menunggu Konfirmasi", "Quotation", "Menunggu Pembayaran", "Menunggu Verifikasi", "In Progress", "Revisi", "Selesai"].map(s =>
             <option key={s} value={s}>{s}</option>
           )}
         </select>
@@ -130,6 +131,26 @@ function OrderRow({ order, onSave, onChat }) {
           }}>
             💬 Chat
           </button>
+          {order.status === "Menunggu Verifikasi" && (
+            <button onClick={() => { setStatus("In Progress"); onSave(order.id, progress, "In Progress", harga, resultLink); }} style={{
+              padding: "8px 12px", borderRadius: "6px",
+              background: "rgba(34,197,94,0.15)",
+              color: "#22C55E", border: "1px solid rgba(34,197,94,0.4)",
+              fontWeight: 700, fontSize: "12px", cursor: "pointer", whiteSpace: "nowrap",
+            }}>
+              ✅ Verifikasi
+            </button>
+          )}
+          {order.bukti_pembayaran && (
+            <a href={`http://localhost:5000/uploads/${order.bukti_pembayaran}`} target="_blank" rel="noopener noreferrer" style={{
+              padding: "8px 12px", borderRadius: "6px",
+              background: "rgba(34,197,94,0.1)",
+              color: "#22C55E", border: "1px solid rgba(34,197,94,0.3)",
+              fontWeight: 600, fontSize: "12px", textDecoration: "none", whiteSpace: "nowrap", display: "flex", alignItems: "center"
+            }}>
+              🧾 Bukti
+            </a>
+          )}
         </div>
       </td>
     </tr>

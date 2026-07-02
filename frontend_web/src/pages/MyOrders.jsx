@@ -18,6 +18,12 @@ export default function MyOrders() {
   const [socketInstance, setSocketInstance] = useState(null);
   const messagesEndRef = useRef(null);
 
+  // Invoice States
+  const [showInvoice, setShowInvoice] = useState(false);
+  const [invoiceOrder, setInvoiceOrder] = useState(null);
+  const [buktiFile, setBuktiFile] = useState(null);
+  const [isUploading, setIsUploading] = useState(false);
+
   useEffect(() => {
     if (isAuthenticated) {
       fetchOrders();
@@ -36,6 +42,26 @@ export default function MyOrders() {
       console.error("Gagal fetch pesanan:", e);
     }
     setIsLoading(false);
+  };
+
+  const handleUploadBukti = async (e) => {
+    e.preventDefault();
+    if (!buktiFile || !invoiceOrder) return;
+    setIsUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append("bukti_pembayaran", buktiFile);
+      await api.put(`/custom-orders/pay/${invoiceOrder.id}`, formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+      });
+      alert("Bukti pembayaran berhasil diupload! Menunggu verifikasi admin 🚀");
+      setShowInvoice(false);
+      setBuktiFile(null);
+      fetchOrders();
+    } catch (err) {
+      alert("Gagal mengupload bukti pembayaran.");
+    }
+    setIsUploading(false);
   };
 
   // Setup Socket.IO for the selected order
@@ -91,6 +117,7 @@ export default function MyOrders() {
   const getStatusColor = (status) => {
     const s = (status || "").toLowerCase();
     if (s.includes("selesai")) return { color: "#22C55E", bg: "rgba(34,197,94,0.1)", border: "rgba(34,197,94,0.3)" };
+    if (s.includes("verifikasi")) return { color: "#3B82F6", bg: "rgba(59,130,246,0.1)", border: "rgba(59,130,246,0.3)" };
     if (s.includes("progress") || s.includes("proses")) return { color: "#00F0FF", bg: "rgba(0,240,255,0.1)", border: "rgba(0,240,255,0.3)" };
     if (s.includes("pembayaran") || s.includes("quotation")) return { color: "#8B5CF6", bg: "rgba(139,92,246,0.1)", border: "rgba(139,92,246,0.3)" };
     return { color: "#F59E0B", bg: "rgba(245,158,11,0.1)", border: "rgba(245,158,11,0.3)" };
@@ -205,12 +232,12 @@ export default function MyOrders() {
                         </div>
                         <div style={{ display: "flex", gap: "10px" }}>
                           {(order.status || "").toLowerCase().includes("pembayaran") && (
-                            <button onClick={() => navigate("/custom-order")} style={{
+                            <button onClick={() => { setInvoiceOrder(order); setShowInvoice(true); }} style={{
                               padding: "8px 16px", borderRadius: "8px",
                               background: "var(--accent-cyan)", color: "#0F172A",
                               border: "none", fontWeight: 700, cursor: "pointer", fontSize: "13px",
                             }}>
-                              💳 Bayar
+                              🧾 Lihat Invoice & Bayar
                             </button>
                           )}
                           <button onClick={() => setSelectedOrder(isSelected ? null : order)} style={{
@@ -314,6 +341,141 @@ export default function MyOrders() {
           </div>
         )}
       </div>
+
+      {/* MODAL INVOICE */}
+      {showInvoice && invoiceOrder && (
+        <div style={{
+          position: "fixed", top: 0, left: 0, right: 0, bottom: 0, zIndex: 9999,
+          background: "rgba(15,23,42,0.8)", backdropFilter: "blur(8px)",
+          display: "flex", alignItems: "center", justifyContent: "center", padding: "20px"
+        }}>
+          <div style={{
+            background: "var(--bg-surface)", width: "100%", maxWidth: "600px", 
+            borderRadius: "16px", border: "1px solid var(--border-cyan)", 
+            boxShadow: "0 20px 40px rgba(0,0,0,0.5)", overflow: "hidden", 
+            display: "flex", flexDirection: "column", maxHeight: "90vh"
+          }}>
+            {/* Header Modal */}
+            <div style={{ padding: "24px", borderBottom: "1px dashed var(--border-subtle)", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div>
+                <h3 style={{ color: "var(--text-white)", margin: "0 0 6px", fontSize: "20px", fontWeight: 800 }}>INVOICE TAGIHAN</h3>
+                <p style={{ color: "var(--text-grey)", fontSize: "13px", margin: 0, fontFamily: "monospace" }}>
+                  INV-VOLTER-{invoiceOrder.id.toString().padStart(4, '0')}-{new Date().getFullYear()}
+                </p>
+              </div>
+              <button 
+                onClick={() => { setShowInvoice(false); setBuktiFile(null); }}
+                style={{ background: "transparent", border: "none", color: "var(--text-grey)", cursor: "pointer", fontSize: "24px" }}
+              >
+                &times;
+              </button>
+            </div>
+            
+            <div style={{ padding: "24px", overflowY: "auto", display: "flex", flexDirection: "column", gap: "24px" }}>
+              
+              {/* Rincian Pesanan */}
+              <div style={{ background: "var(--bg-primary)", padding: "16px", borderRadius: "10px", border: "1px solid var(--border-subtle)" }}>
+                <h4 style={{ color: "var(--text-white)", fontSize: "14px", marginBottom: "12px", borderBottom: "1px solid var(--border-subtle)", paddingBottom: "8px" }}>Rincian Pesanan</h4>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                  <span style={{ color: "var(--text-grey)", fontSize: "13px" }}>Klien</span>
+                  <span style={{ color: "var(--text-white)", fontSize: "13px", fontWeight: 600 }}>{user?.nama || user?.name || "Klien Volter"}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                  <span style={{ color: "var(--text-grey)", fontSize: "13px" }}>Nama Project</span>
+                  <span style={{ color: "var(--text-white)", fontSize: "13px", fontWeight: 600, textAlign: "right" }}>{invoiceOrder.judul_project}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "16px" }}>
+                  <span style={{ color: "var(--text-grey)", fontSize: "13px" }}>Platform</span>
+                  <span style={{ color: "var(--text-white)", fontSize: "13px", fontWeight: 600 }}>{invoiceOrder.platform || "Roblox Studio"}</span>
+                </div>
+                <div style={{ display: "flex", justifyContent: "space-between", borderTop: "1px dashed var(--border-cyan)", paddingTop: "12px" }}>
+                  <span style={{ color: "var(--text-white)", fontSize: "14px", fontWeight: 700 }}>Total Pembayaran</span>
+                  <span style={{ color: "var(--accent-cyan)", fontSize: "18px", fontWeight: 800 }}>
+                    Rp {parseFloat(invoiceOrder.harga_tawaran || 0).toLocaleString("id-ID")}
+                  </span>
+                </div>
+              </div>
+
+              {/* Instruksi Pembayaran */}
+              <div>
+                <h4 style={{ color: "var(--text-white)", fontSize: "14px", marginBottom: "12px" }}>💳 Transfer Ke Rekening Berikut:</h4>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "12px" }}>
+                  <div style={{ background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.3)", padding: "12px", borderRadius: "8px" }}>
+                    <p style={{ margin: "0 0 4px", fontSize: "12px", color: "var(--text-grey)", fontWeight: 700 }}>Bank BCA</p>
+                    <p style={{ margin: "0 0 4px", fontSize: "16px", color: "var(--text-white)", fontWeight: 800, letterSpacing: "1px" }}>0123 4567 89</p>
+                    <p style={{ margin: 0, fontSize: "11px", color: "var(--text-grey)" }}>a.n. Volter Studio</p>
+                  </div>
+                  <div style={{ background: "rgba(34,197,94,0.1)", border: "1px solid rgba(34,197,94,0.3)", padding: "12px", borderRadius: "8px" }}>
+                    <p style={{ margin: "0 0 4px", fontSize: "12px", color: "var(--text-grey)", fontWeight: 700 }}>GoPay / Dana</p>
+                    <p style={{ margin: "0 0 4px", fontSize: "16px", color: "var(--text-white)", fontWeight: 800, letterSpacing: "1px" }}>0812 3456 7890</p>
+                    <p style={{ margin: 0, fontSize: "11px", color: "var(--text-grey)" }}>a.n. Volter Studio</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Form Upload Bukti */}
+              <form onSubmit={handleUploadBukti} style={{ marginTop: "8px" }}>
+                <h4 style={{ color: "var(--text-white)", fontSize: "14px", marginBottom: "8px" }}>🧾 Konfirmasi Pembayaran</h4>
+                <p style={{ color: "var(--text-grey)", fontSize: "12px", margin: "0 0 12px" }}>Upload foto struk atau screenshot transfer di sini.</p>
+                
+                <div style={{ 
+                  border: "2px dashed var(--border-subtle)", borderRadius: "10px", 
+                  padding: "20px", textAlign: "center", background: "var(--bg-primary)",
+                  cursor: "pointer", transition: "all 0.2s"
+                }}
+                  onMouseEnter={e => e.currentTarget.style.borderColor = "var(--accent-cyan)"}
+                  onMouseLeave={e => e.currentTarget.style.borderColor = "var(--border-subtle)"}
+                  onClick={() => document.getElementById("bukti-upload").click()}
+                >
+                  <input 
+                    type="file" 
+                    id="bukti-upload" 
+                    style={{ display: "none" }} 
+                    accept="image/*"
+                    onChange={(e) => setBuktiFile(e.target.files[0])}
+                  />
+                  {buktiFile ? (
+                    <div>
+                      <div style={{ fontSize: "24px", marginBottom: "8px" }}>✅</div>
+                      <p style={{ color: "var(--text-white)", margin: 0, fontSize: "13px", fontWeight: 600 }}>{buktiFile.name}</p>
+                      <p style={{ color: "var(--accent-cyan)", margin: "4px 0 0", fontSize: "11px" }}>Klik untuk ganti file</p>
+                    </div>
+                  ) : (
+                    <div>
+                      <div style={{ fontSize: "24px", marginBottom: "8px" }}>📸</div>
+                      <p style={{ color: "var(--text-grey)", margin: 0, fontSize: "13px" }}>Pilih atau tarik file gambar ke sini</p>
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ display: "flex", gap: "12px", marginTop: "24px" }}>
+                  <button
+                    type="button"
+                    onClick={() => { setShowInvoice(false); setBuktiFile(null); }}
+                    style={{
+                      flex: 1, padding: "14px", borderRadius: "8px", background: "var(--bg-primary)",
+                      color: "var(--text-grey)", border: "1px solid var(--border-subtle)", cursor: "pointer", fontWeight: 600
+                    }}
+                  >
+                    Nanti Saja
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={isUploading || !buktiFile}
+                    style={{
+                      flex: 2, padding: "14px", borderRadius: "8px", background: "var(--accent-cyan)",
+                      color: "#0F172A", border: "none", cursor: (isUploading || !buktiFile) ? "not-allowed" : "pointer",
+                      fontWeight: 700, opacity: (isUploading || !buktiFile) ? 0.7 : 1
+                    }}
+                  >
+                    {isUploading ? "Mengunggah..." : "Kirim Bukti Pembayaran"}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      )}
     </PublicLayout>
   );
 }

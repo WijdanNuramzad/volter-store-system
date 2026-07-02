@@ -3,6 +3,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:file_picker/file_picker.dart';
+import 'dart:io';
 import 'constants.dart';
 import 'create_request_screen.dart';
 import 'chat_screen.dart';
@@ -61,28 +63,52 @@ class _CustomOrderScreenState extends State<CustomOrderScreen> {
   }
 
   Future<void> _prosesPembayaran(int orderId) async {
-    setState(() => _isLoading = true);
-    try {
-      // ✅ FIX: Tambah Authorization header
-      final headers = await AppConstants.getAuthHeaders();
-      final response = await http.put(
-        Uri.parse('${AppConstants.kBaseUrl}/api/custom-orders/pay/$orderId'),
-        headers: headers,
-      );
-      if (response.statusCode == 200) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Pembayaran Berhasil! Markas mulai bekerja 🚀'),
-            backgroundColor: Colors.greenAccent,
-          ),
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+      type: FileType.image,
+    );
+
+    if (result != null && result.files.single.path != null) {
+      File file = File(result.files.single.path!);
+      
+      setState(() => _isLoading = true);
+      try {
+        final headers = await AppConstants.getAuthHeaders();
+        final request = http.MultipartRequest(
+          'PUT',
+          Uri.parse('${AppConstants.kBaseUrl}/api/custom-orders/pay/$orderId'),
         );
-        _fetchOrders();
-      } else {
+        request.headers.addAll(headers);
+        request.files.add(await http.MultipartFile.fromPath('bukti_pembayaran', file.path));
+
+        final response = await request.send();
+        
+        if (response.statusCode == 200) {
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Pembayaran Berhasil! Bukti terkirim 🚀'),
+                backgroundColor: Colors.greenAccent,
+              ),
+            );
+          }
+          _fetchOrders();
+        } else {
+          setState(() => _isLoading = false);
+          if (context.mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(content: Text('Gagal mengirim bukti pembayaran.'), backgroundColor: Colors.redAccent),
+            );
+          }
+        }
+      } catch (e) {
+        print(e);
         setState(() => _isLoading = false);
+        if (context.mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Terjadi kesalahan koneksi.'), backgroundColor: Colors.redAccent),
+          );
+        }
       }
-    } catch (e) {
-      print(e);
-      setState(() => _isLoading = false);
     }
   }
 
